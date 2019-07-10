@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const userDB = require('./userDb.js');
+const postDB = require('../posts/postDb.js');
 
 router.post('/', validateUser, (req, res) => {
     const userInfo = req.body;
@@ -14,8 +15,16 @@ router.post('/', validateUser, (req, res) => {
         })
 });
 
-router.post('/:id/posts', (req, res) => {
-
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
+    const { id } = req.params;
+    const text = req.body;
+    postDB.insert({user_id: id, ...text})
+    .then(post => {
+        res.status(201).json(post);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The post could not be created." });
+    })
 });
 
 // GET all users
@@ -42,8 +51,16 @@ router.get('/:id', validateUserId, (req, res) => {
 
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
+    const { id } = req.params;
 
+    userDB.getUserPosts(id)
+    .then(posts => {
+        res.status(200).json(posts);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The posts could not be retrieved." });
+    })
 });
 
 router.delete('/:id', validateUserId,  (req, res) => {
