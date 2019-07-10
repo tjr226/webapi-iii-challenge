@@ -46,11 +46,27 @@ router.get('/:id/posts', (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
-
+router.delete('/:id', validateUserId,  (req, res) => {
+    const { id } = req.params;
+    userDB.remove(id)
+    .then(response => {
+        res.status(200).json(response);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The user could not be deleted." });
+    })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, validateUser, (req, res) => {
+    const { id } = req.params;
+    userInfo = req.body;
+    userDB.update(id, userInfo)
+    .then(response => {
+        res.status(200).json(response);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The user could not be updated." });
+    })
 
 });
 
@@ -81,7 +97,12 @@ function validateUser(req, res, next) {
 };
 
 function validatePost(req, res, next) {
-
+    const postInfo = req.body;
+    if (postInfo.text === undefined) {
+        return res.status(400).json({ errorMessage: "Please provide post text." });
+    } else {
+        next();
+    }
 };
 
 module.exports = router;
