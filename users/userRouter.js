@@ -29,7 +29,16 @@ router.get('/', (req, res) => {
         })
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId, (req, res) => {
+    const { id } = req.params;
+
+    userDB.getById(id)
+    .then(user => {
+        res.status(200).json(user);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The user information could not be retrieved." })
+    })
 
 });
 
@@ -48,7 +57,18 @@ router.put('/:id', (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
-
+    const { id } = req.params;
+    userDB.getById(id)
+        .then(user => {
+            if (user === undefined) {
+                return res.status(404).json({ message: "The User ID does not exist." });
+            } else {
+                next();
+            }
+        })
+        .catch(error => {
+            return res.status(400).json({ errorMessage: "There was an error accessing the database." });
+        })
 };
 
 function validateUser(req, res, next) {
