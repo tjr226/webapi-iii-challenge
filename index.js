@@ -14,15 +14,10 @@ server.use('/', (req, res) => res.send('API up and running'));
 
 function logger(req, res, next) {
     console.log(
-        `[${new Date().toISOString()}] ${req.method} to ${req.url} from ${req.get(
-            'Origin'
-        )}`
+        `[${new Date().toISOString()}] ${req.method} to ${req.url} from ${req.get('Origin')}`
     );
-
     next();
 }
-
-
 
 const port = 5000;
 
