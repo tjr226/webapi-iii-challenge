@@ -41,6 +41,8 @@ router.get('/', (req, res) => {
 router.get('/:id', validateUserId, (req, res) => {
     const { id } = req.params;
 
+    // res.status(200).json(req.user);
+
     userDB.getById(id)
     .then(user => {
         res.status(200).json(user);
@@ -96,6 +98,7 @@ function validateUserId(req, res, next) {
             if (user === undefined) {
                 return res.status(404).json({ message: "The User ID does not exist." });
             } else {
+                // req.user = user
                 next();
             }
         })
